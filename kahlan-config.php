@@ -8,7 +8,6 @@ use Kahlan\Reporter\Coverage\Exporter\Clover;
 
 $commandLine = $this->commandLine();
 $commandLine->option('ff', 'default', 1);
-$commandLine->option('coverage', 'default', 3);
 $commandLine->option('coverage-scrutinizer', 'default', 'scrutinizer.xml');
 
 Filters::apply($this, 'reporting', function ($next) {
@@ -43,5 +42,3 @@ Filters::apply($this, 'coverage', function ($next) {
     ]);
     $reporters->add('coverage', $coverage);
 });
-
-require_once realpath(rtrim(getcwd(), '\\/ ')).DIRECTORY_SEPARATOR.'spec'.DIRECTORY_SEPARATOR.'bootstrap.php';

@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of dimtrovich/cart".
+ *
+ * (c) 2024 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace Dimtrovich\Cart;
 
 use BlitzPHP\Contracts\Event\EventManagerInterface;
@@ -15,7 +24,7 @@ use InvalidArgumentException;
 
 class Cart
 {
-    const DEFAULT_INSTANCE = 'default';
+    public const DEFAULT_INSTANCE = 'default';
 
     /**
      * Instance of the session manager.
@@ -30,8 +39,8 @@ class Cart
     /**
      * Cart constructor.
      *
-     * @param array $config Configuration of cart instance
-     * @param EventManagerInterface $event Instance of the event manager
+     * @param array                 $config Configuration of cart instance
+     * @param EventManagerInterface $event  Instance of the event manager
      */
     public function __construct(private array $config = [], ?StoreManager $store = null, private ?EventManagerInterface $event = null)
     {
@@ -67,7 +76,7 @@ class Cart
      *
      * @return CartItem|CartItem[]
      */
-    public function add(mixed $id, mixed $name = null, int|float|null $qty = null, ?float $price = null, array $options = [])
+    public function add(mixed $id, mixed $name = null, null|float|int $qty = null, ?float $price = null, array $options = [])
     {
         if ($this->isMulti($id)) {
             return array_map(fn ($item) => $this->add($item), $id);
@@ -82,7 +91,7 @@ class Cart
         }
 
         $content->put($cartItem->rowId, $cartItem);
-        
+
         $this->emit('cart.added', $cartItem);
 
         $this->store->put($content);
@@ -118,10 +127,10 @@ class Cart
 
         if ($cartItem->qty <= 0) {
             $this->remove($cartItem->rowId);
+
             return null;
-        } else {
-            $content->put($cartItem->rowId, $cartItem);
         }
+        $content->put($cartItem->rowId, $cartItem);
 
         $this->emit('cart.updated', $cartItem);
 
@@ -153,8 +162,9 @@ class Cart
     {
         $content = $this->getContent();
 
-        if ( ! $content->has($rowId))
+        if (! $content->has($rowId)) {
             throw new InvalidRowIDException("The cart does not contain rowId {$rowId}.");
+        }
 
         return $content->get($rowId);
     }
@@ -182,7 +192,7 @@ class Cart
     /**
      * Get the number of items in the cart.
      *
-     * @return int|float
+     * @return float|int
      */
     public function count()
     {
@@ -198,9 +208,7 @@ class Cart
     {
         $content = $this->getContent();
 
-        $total = $content->reduce(function ($total, CartItem $cartItem) {
-            return $total + ($cartItem->qty * $cartItem->priceTax);
-        }, 0);
+        $total = $content->reduce(fn ($total, CartItem $cartItem) => $total + ($cartItem->qty * $cartItem->priceTax), 0);
 
         return $this->numberFormat($total, $decimals, $decimalPoint, $thousandSeperator);
     }
@@ -212,9 +220,7 @@ class Cart
     {
         $content = $this->getContent();
 
-        $tax = $content->reduce(function ($tax, CartItem $cartItem) {
-            return $tax + ($cartItem->qty * $cartItem->tax);
-        }, 0);
+        $tax = $content->reduce(fn ($tax, CartItem $cartItem) => $tax + ($cartItem->qty * $cartItem->tax), 0);
 
         return $this->numberFormat($tax, $decimals, $decimalPoint, $thousandSeperator);
     }
@@ -226,9 +232,7 @@ class Cart
     {
         $content = $this->getContent();
 
-        $subTotal = $content->reduce(function ($subTotal, CartItem $cartItem) {
-            return $subTotal + ($cartItem->qty * $cartItem->price);
-        }, 0);
+        $subTotal = $content->reduce(fn ($subTotal, CartItem $cartItem) => $subTotal + ($cartItem->qty * $cartItem->price), 0);
 
         return $this->numberFormat($subTotal, $decimals, $decimalPoint, $thousandSeperator);
     }
@@ -246,7 +250,7 @@ class Cart
     /**
      * Set the tax rate for the cart item with the given rowId.
      */
-    public function setTax(string $rowId, int|float $taxRate): void
+    public function setTax(string $rowId, float|int $taxRate): void
     {
         $cartItem = $this->get($rowId);
 
@@ -263,6 +267,7 @@ class Cart
      * Magic method to make accessing the total, tax and subtotal properties possible.
      *
      * @param string $attribute
+     *
      * @return float|null
      */
     public function __get($attribute)
@@ -287,17 +292,15 @@ class Cart
      */
     protected function getContent(): Collection
     {
-        $content = $this->store->has()
+        return $this->store->has()
             ? $this->store->get()
-            : new Collection;
-
-        return $content;
+            : new Collection();
     }
 
     /**
      * Create a new CartItem from the supplied attributes.
      */
-    private function createCartItem(mixed $id, mixed $name, int|float $qty, float $price, array $options): CartItem
+    private function createCartItem(mixed $id, mixed $name, float|int $qty, float $price, array $options): CartItem
     {
         if ($id instanceof Buyable) {
             $cartItem = CartItem::fromBuyable($id, $qty ?: []);
@@ -320,7 +323,7 @@ class Cart
      */
     private function isMulti(mixed $item): bool
     {
-        if ( ! is_array($item)) {
+        if (! is_array($item)) {
             return false;
         }
 
@@ -334,13 +337,13 @@ class Cart
      */
     private function numberFormat(float $value, ?int $decimals, ?string $decimalPoint, ?string $thousandSeperator): string
     {
-        if (is_null($decimals)){
+        if (null === $decimals) {
             $decimals = $this->config('format.decimals', 2);
         }
-        if (is_null($decimalPoint)){
+        if (null === $decimalPoint) {
             $decimalPoint = $this->config('format.decimal_point', '.');
         }
-        if (is_null($thousandSeperator)){
+        if (null === $thousandSeperator) {
             $thousandSeperator = $this->config('format.thousand_seperator', ',');
         }
 
@@ -366,10 +369,10 @@ class Cart
         } else {
             /** @var class-string<StoreManager> */
             $handler = $this->config('handler', Session::class);
-            if (!class_exists($handler) || !is_a($handler, StoreManager::class, true)) {
+            if (! class_exists($handler) || ! is_a($handler, StoreManager::class, true)) {
                 throw new InvalidArgumentException(sprintf('handler must be an class that implements %s', StoreManager::class));
             }
-                
+
             $store = new $handler();
             if (! $store->init($this->currentInstance())) {
                 throw new Exception(sprintf('handler %s could not be initialize', $handler));

@@ -10,7 +10,7 @@
     "authors": [
         {
             "name": "Dimitri Sitchet Tomkeu",
-            "email": "dimitrisitchet@gmail.com",
+            "email": "devcode.dst@gmail.com",
             "role": "Developer"
         }
     ],
@@ -34,7 +34,7 @@
     },
     "scripts": {
         "test": "vendor/bin/kahlan",
-		"test:cov": "vendor/bin/kahlan --coverage=4 --reporter=verbose --clover=clover.xml",
+		"test:cov": "vendor/bin/kahlan --coverage=4 --reporter=verbose",
         "format": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --allow-risky=yes",
 		"analyze": [
             "Composer\\Config::disableProcessTimeout",

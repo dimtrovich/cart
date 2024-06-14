@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of dimtrovich/cart".
+ *
+ * (c) 2024 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
 namespace Dimtrovich\Cart\Handlers;
 
 use Dimtrovich\Cart\Contracts\StoreManager;
@@ -8,11 +17,11 @@ class Cookie extends BaseHandler implements StoreManager
 {
     public function has(): bool
     {
-        return isset($_COOKIE[$this->key()]);    
+        return isset($_COOKIE[$this->key()]);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function read(): array
     {
@@ -39,7 +48,7 @@ class Cookie extends BaseHandler implements StoreManager
     protected function write(array $value): void
     {
         setcookie(
-            name: $this->key(), 
+            name: $this->key(),
             value: serialize($value),
             httponly: true
         );
