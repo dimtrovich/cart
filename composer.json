@@ -1,39 +1,41 @@
 {
-    "name": ":vendor_slug/:package_slug",
-    "description": ":package_description",
+    "name": "dimtrovich/cart",
+    "description": "Modern, flexible shopping cart system for use in e-commerce web applications.",
     "keywords": [
-        ":vendor_name",
-        ":package_slug"
+        "dimtrovich",
+        "cart"
     ],
-    "homepage": "https://github.com/:vendor_slug/:package_slug",
+    "homepage": "https://github.com/dimtrovich/cart",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "Dimitri Sitchet Tomkeu",
+            "email": "dimitrisitchet@gmail.com",
             "role": "Developer"
         }
     ],
     "require": {
-        "php": "^8.1"
+        "php": "^8.1",
+        "blitz-php/traits": "^1.6"
     },
     "require-dev": {
-        :require_dev_testing,
-        :require_dev_codestyle
+        "kahlan/kahlan": "^5.2",
+        "blitz-php/coding-standard": "^1.4"
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src"
+            "Dimtrovich\\Cart\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Spec\\": "spec"
+            "Dimtrovich\\Cart\\Spec\\": "spec"
         }
     },
     "scripts": {
-        :scripts_testing,
-        :scripts_codestyle,
+        "test": "vendor/bin/kahlan",
+		"test:cov": "vendor/bin/kahlan --coverage=4 --reporter=verbose --clover=clover.xml",
+        "format": "vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --allow-risky=yes",
 		"analyze": [
             "Composer\\Config::disableProcessTimeout",
             "bash -c \"XDEBUG_MODE=off phpstan analyse\""
@@ -47,7 +49,6 @@
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            :plugins_testing,
             "phpstan/extension-installer": true
         }
     },
