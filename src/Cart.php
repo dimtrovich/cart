@@ -25,9 +25,9 @@ use RuntimeException;
 /**
  * Cart processor
  *
- * @property float|int $total Total price of the items in the cart.
  * @property float|int $subtotal Subtotal (total - tax) of the items in the cart.
- * @property float|int $tax Total tax of the items in the cart.
+ * @property float|int $tax      Total tax of the items in the cart.
+ * @property float|int $total    Total price of the items in the cart.
  */
 class Cart
 {
@@ -42,7 +42,7 @@ class Cart
      * Cart constructor.
      *
      * @param array                 $config Configuration of cart instance
-	 * @param ?StoreManager 		$store  Instance of the session manager.
+     * @param ?StoreManager         $store  Instance of the session manager.
      * @param EventManagerInterface $event  Instance of the event manager
      */
     public function __construct(private array $config = [], private ?StoreManager $store = null, private ?EventManagerInterface $event = null)
@@ -64,7 +64,7 @@ class Cart
 
         $this->instance = sprintf('%s.%s', 'cart', $instance);
 
-		$this->initStore();
+        $this->initStore();
 
         return $this;
     }
@@ -82,7 +82,7 @@ class Cart
      *
      * @return CartItem|CartItem[]
      */
-    public function add(mixed $id, mixed $name = null, array|float|int|null $qty = null, ?float $price = null, array $options = [])
+    public function add(mixed $id, mixed $name = null, null|array|float|int $qty = null, ?float $price = null, array $options = [])
     {
         if ($this->isMulti($id)) {
             return array_map(fn ($item) => $this->add($item), $id);
@@ -205,8 +205,8 @@ class Cart
 
     /**
      * Get the total price of the items in the cart.
-	 *
-	 * @return float|string
+     *
+     * @return float|string
      */
     public function total(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null)
     {
@@ -219,8 +219,8 @@ class Cart
 
     /**
      * Get the total tax of the items in the cart.
-	 *
-	 * @return float|string
+     *
+     * @return float|string
      */
     public function tax(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null)
     {
@@ -233,8 +233,8 @@ class Cart
 
     /**
      * Get the subtotal (total - tax) of the items in the cart.
-	 *
-	 * @return float|string
+     *
+     * @return float|string
      */
     public function subtotal(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null)
     {
@@ -242,7 +242,7 @@ class Cart
 
         $subTotal = $content->reduce(fn ($subTotal, CartItem $cartItem) => $subTotal + ($cartItem->qty * $cartItem->price), 0);
 
-		return func_num_args() < 2 ? $subTotal : $this->numberFormat($subTotal, $decimals, $decimalPoint, $thousandSeperator);
+        return func_num_args() < 2 ? $subTotal : $this->numberFormat($subTotal, $decimals, $decimalPoint, $thousandSeperator);
     }
 
     /**
@@ -304,15 +304,15 @@ class Cart
             ? $this->store->get()
             : new Collection();
 
-		return $content->map(fn($attribute) => $this->createCartItem($attribute, null, null, null, []));
+        return $content->map(fn ($attribute) => $this->createCartItem($attribute, null, null, null, []));
     }
 
     /**
      * Create a new CartItem from the supplied attributes.
      */
-    private function createCartItem(mixed $id, mixed $name, array|float|int|null $qty, ?float $price, array $options): CartItem
+    private function createCartItem(mixed $id, mixed $name, null|array|float|int $qty, ?float $price, array $options): CartItem
     {
-		$taxRate = null;
+        $taxRate = null;
 
         if ($id instanceof Buyable) {
             $cartItem = CartItem::fromBuyable($id, $qty ?: []);
@@ -320,9 +320,9 @@ class Cart
         } elseif (is_array($id)) {
             $cartItem = CartItem::fromArray($id);
             $cartItem->setQuantity($id['qty']);
-			if (isset($id['tax'])) {
-				$taxRate = (100 * $id['tax']) / $id['price'];
-			}
+            if (isset($id['tax'])) {
+                $taxRate = (100 * $id['tax']) / $id['price'];
+            }
         } else {
             $cartItem = CartItem::fromAttributes($id, $name, $price, $options);
             $cartItem->setQuantity($qty);
@@ -352,7 +352,7 @@ class Cart
      */
     private function numberFormat(float $value, ?int $decimals, ?string $decimalPoint, ?string $thousandSeperator): string
     {
-		if (null === $decimals) {
+        if (null === $decimals) {
             $decimals = $this->config('format.decimals', 2);
         }
         if (null === $decimalPoint) {
@@ -365,17 +365,17 @@ class Cart
         return number_format($value, $decimals, $decimalPoint, $thousandSeperator);
     }
 
-	/**
-	 * Get a specific configuration for card
-	 */
+    /**
+     * Get a specific configuration for card
+     */
     private function config(string $key, mixed $default = null): mixed
     {
         return Arr::dataGet($this->config, $key, $default);
     }
 
-	/**
-	 * Emit event
-	 */
+    /**
+     * Emit event
+     */
     private function emit(string $event, mixed $target = null): void
     {
         if (null !== $this->event) {
@@ -383,12 +383,12 @@ class Cart
         }
     }
 
-	/**
-	 * Initialize cart store manager
-	 */
+    /**
+     * Initialize cart store manager
+     */
     private function initStore(): self
     {
-		if (null === $this->store) {
+        if (null === $this->store) {
             /** @var class-string<StoreManager> */
             $handler = $this->config('handler', Session::class);
             if (! class_exists($handler) || ! is_a($handler, StoreManager::class, true)) {
@@ -398,9 +398,9 @@ class Cart
             $this->store = new $handler();
         }
 
-		if (! $this->store->init($this->currentInstance())) {
-			throw new RuntimeException(sprintf('Handler %s could not be initialize', $handler));
-		}
+        if (! $this->store->init($this->currentInstance())) {
+            throw new RuntimeException(sprintf('Handler %s could not be initialize', $handler));
+        }
 
         return $this;
     }

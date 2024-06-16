@@ -20,11 +20,11 @@ use InvalidArgumentException;
 /**
  * Representation of an item in a cart
  *
- * @property float|int $total Price for whole CartItem with TAX
  * @property float|int $priceTax Price with TAX
  * @property float|int $subtotal Price for whole CartItem without TAX
- * @property float|int $tax Applicable tax for one cart item
+ * @property float|int $tax      Applicable tax for one cart item
  * @property float|int $taxTotal Applicable tax for whole cart item
+ * @property float|int $total    Price for whole CartItem with TAX
  */
 class CartItem implements Arrayable, Jsonable
 {
@@ -72,15 +72,15 @@ class CartItem implements Arrayable, Jsonable
             throw new InvalidArgumentException('Please supply a valid price.');
         }
 
-		$this->price    = (float) $price;
-		$this->options  = new CartItemOptions($options);
-		$this->rowId    = $this->generateRowId($id, $options);
+        $this->price   = (float) $price;
+        $this->options = new CartItemOptions($options);
+        $this->rowId   = $this->generateRowId($id, $options);
     }
 
     /**
      * Returns the formatted price without TAX.
-	 *
-	 * @return float|string
+     *
+     * @return float|string
      */
     public function price(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null)
     {
@@ -89,8 +89,8 @@ class CartItem implements Arrayable, Jsonable
 
     /**
      * Returns the formatted price with TAX.
-	 *
-	 * @return float|string
+     *
+     * @return float|string
      */
     public function priceTax(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null)
     {
@@ -100,8 +100,8 @@ class CartItem implements Arrayable, Jsonable
     /**
      * Returns the formatted subtotal.
      * Subtotal is price for whole CartItem without TAX
-	 *
-	 * @return float|string
+     *
+     * @return float|string
      */
     public function subtotal(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null)
     {
@@ -111,8 +111,8 @@ class CartItem implements Arrayable, Jsonable
     /**
      * Returns the formatted total.
      * Total is price for whole CartItem with TAX
-	 *
-	 * @return float|string
+     *
+     * @return float|string
      */
     public function total(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null)
     {
@@ -121,8 +121,8 @@ class CartItem implements Arrayable, Jsonable
 
     /**
      * Returns the formatted tax.
-	 *
-	 * @return float|string
+     *
+     * @return float|string
      */
     public function tax(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null)
     {
@@ -131,8 +131,8 @@ class CartItem implements Arrayable, Jsonable
 
     /**
      * Returns the formatted tax.
-	 *
-	 * @return float|string
+     *
+     * @return float|string
      */
     public function taxTotal(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null)
     {
@@ -152,9 +152,9 @@ class CartItem implements Arrayable, Jsonable
      */
     public function updateFromBuyable(Buyable $item): void
     {
-        $this->id       = $item->getBuyableIdentifier($this->options);
-        $this->name     = $item->getBuyableDescription($this->options);
-        $this->price    = $item->getBuyablePrice($this->options);
+        $this->id    = $item->getBuyableIdentifier($this->options);
+        $this->name  = $item->getBuyableDescription($this->options);
+        $this->price = $item->getBuyablePrice($this->options);
     }
 
     /**
@@ -162,11 +162,11 @@ class CartItem implements Arrayable, Jsonable
      */
     public function updateFromArray(array $attributes): void
     {
-        $this->id       = Arr::get($attributes, 'id', $this->id);
-        $this->qty      = Arr::get($attributes, 'qty', $this->qty);
-        $this->name     = Arr::get($attributes, 'name', $this->name);
-        $this->price    = Arr::get($attributes, 'price', $this->price);
-        $this->options  = new CartItemOptions(Arr::get($attributes, 'options', $this->options->toArray()));
+        $this->id      = Arr::get($attributes, 'id', $this->id);
+        $this->qty     = Arr::get($attributes, 'qty', $this->qty);
+        $this->name    = Arr::get($attributes, 'name', $this->name);
+        $this->price   = Arr::get($attributes, 'price', $this->price);
+        $this->options = new CartItemOptions(Arr::get($attributes, 'options', $this->options->toArray()));
 
         $this->rowId = $this->generateRowId($this->id, $this->options->all());
     }
