@@ -1,6 +1,12 @@
 name: Check & fix styling
 
-on: [push]
+on:
+  push:
+    branches:
+      - 'devs'
+  pull_request:
+    branches:
+      - 'devs'
 
 permissions:
   contents: write
