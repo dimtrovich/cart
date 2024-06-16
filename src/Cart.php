@@ -41,7 +41,7 @@ class Cart
     /**
      * Cart constructor.
      *
-     * @param array                 $config Configuration of cart instance
+     * @param array<string, mixed>  $config Configuration of cart instance
      * @param ?StoreManager         $store  Instance of the session manager.
      * @param EventManagerInterface $event  Instance of the event manager
      */
@@ -79,6 +79,9 @@ class Cart
 
     /**
      * Add an item to the cart.
+     *
+     * @param array<string, mixed>|float|int|null $qty
+     * @param array<string, mixed>                $options
      *
      * @return CartItem|CartItem[]
      */
@@ -309,6 +312,9 @@ class Cart
 
     /**
      * Create a new CartItem from the supplied attributes.
+     *
+     * @param array<string, mixed>|float|int|null $qty
+     * @param array<string, mixed>                $options
      */
     private function createCartItem(mixed $id, mixed $name, null|array|float|int $qty, ?float $price, array $options): CartItem
     {
@@ -399,7 +405,7 @@ class Cart
         }
 
         if (! $this->store->init($this->currentInstance())) {
-            throw new RuntimeException(sprintf('Handler %s could not be initialize', $handler));
+            throw new RuntimeException(sprintf('Handler %s could not be initialize', get_class($this->store)));
         }
 
         return $this;

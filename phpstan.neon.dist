@@ -1,4 +1,9 @@
+includes:
+	- phpstan-baseline.php
+
 parameters:
-    level: 4
-    paths:
-        - src
+	phpVersion: 80100
+	tmpDir: build/phpstan
+	level: 6
+	paths:
+		- src

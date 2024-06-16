@@ -17,7 +17,7 @@ use Dimtrovich\Cart\Contracts\StoreManager;
 abstract class BaseHandler implements StoreManager
 {
     /**
-     * cary indentifier
+     * cart indentifier
      */
     protected string $cartId;
 
@@ -53,11 +53,15 @@ abstract class BaseHandler implements StoreManager
 
     /**
      * Get raw value of cart items from store manager.
+     *
+     * @return array<string, mixed>
      */
     abstract protected function read(): array;
 
     /**
      * Set raw value of cart items in store manager.
+     *
+     * @param array<string, mixed> $value
      */
     abstract protected function write(array $value): void;
 

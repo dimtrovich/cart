@@ -56,9 +56,10 @@ class CartItem implements Arrayable, Jsonable
     /**
      * CartItem constructor.
      *
-     * @param int|string $id    The ID of the cart item.
-     * @param string     $name  The name of the cart item.
-     * @param float      $price
+     * @param int|string           $id      The ID of the cart item.
+     * @param string               $name    The name of the cart item.
+     * @param float                $price
+     * @param array<string, mixed> $options
      */
     public function __construct(public int|string $id, public string $name, $price, array $options = [])
     {
@@ -68,7 +69,7 @@ class CartItem implements Arrayable, Jsonable
         if (empty($name)) {
             throw new InvalidArgumentException('Please supply a valid name.');
         }
-        if (strlen($price) < 0 || ! is_numeric($price)) {
+        if (! is_numeric($price)) {
             throw new InvalidArgumentException('Please supply a valid price.');
         }
 
@@ -142,9 +143,11 @@ class CartItem implements Arrayable, Jsonable
     /**
      * Set the quantity for this cart item.
      */
-    public function setQuantity(float|int $qty)
+    public function setQuantity(float|int $qty): self
     {
         $this->qty = $qty;
+
+        return $this;
     }
 
     /**
@@ -159,6 +162,8 @@ class CartItem implements Arrayable, Jsonable
 
     /**
      * Update the cart item from an array.
+     *
+     * @param array<string, mixed> $attributes
      */
     public function updateFromArray(array $attributes): void
     {
@@ -183,10 +188,8 @@ class CartItem implements Arrayable, Jsonable
 
     /**
      * Get an attribute from the cart item or get the associated model.
-     *
-     * @param mixed $attribute
      */
-    public function __get($attribute)
+    public function __get(string $attribute): mixed
     {
         if (property_exists($this, $attribute)) {
             return $this->{$attribute};
@@ -217,32 +220,40 @@ class CartItem implements Arrayable, Jsonable
 
     /**
      * Create a new instance from a Buyable.
+     *
+     * @param array<string, mixed> $options
      */
     public static function fromBuyable(Buyable $item, array $options = []): static
     {
-        return new self($item->getBuyableIdentifier($options), $item->getBuyableDescription($options), $item->getBuyablePrice($options), $options);
+        return new static($item->getBuyableIdentifier($options), $item->getBuyableDescription($options), $item->getBuyablePrice($options), $options);
     }
 
     /**
      * Create a new instance from the given array.
+     *
+     * @param array<string, mixed> $attributes
      */
     public static function fromArray(array $attributes): static
     {
         $options = Arr::get($attributes, 'options', []);
 
-        return new self($attributes['id'], $attributes['name'], $attributes['price'], $options);
+        return new static($attributes['id'], $attributes['name'], $attributes['price'], $options);
     }
 
     /**
      * Create a new instance from the given attributes.
+     *
+     * @param array<string, mixed> $options
      */
     public static function fromAttributes(int|string $id, string $name, float $price, array $options = []): static
     {
-        return new self($id, $name, $price, $options);
+        return new static($id, $name, $price, $options);
     }
 
     /**
      * Generate a unique id for the cart item.
+     *
+     * @param array<string, mixed> $options
      */
     protected function generateRowId(int|string $id, array $options): string
     {
@@ -253,6 +264,8 @@ class CartItem implements Arrayable, Jsonable
 
     /**
      * Get the instance as an array.
+     *
+     * @return array<string, mixed>
      */
     public function toArray(): array
     {
@@ -279,11 +292,9 @@ class CartItem implements Arrayable, Jsonable
     /**
      * Get the formatted number.
      *
-     * @param float  $value
-     * @param string $decimalPoint
-     * @param string $thousandSeperator
+     * @param float $value
      */
-    private function numberFormat($value, int $decimals, $decimalPoint, $thousandSeperator): string
+    private function numberFormat($value, int $decimals, ?string $decimalPoint, ?string $thousandSeperator): string
     {
         if (null === $decimalPoint) {
             $decimalPoint = '.';
