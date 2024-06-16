@@ -47,10 +47,10 @@ class Cookie extends BaseHandler implements StoreManager
      */
     protected function write(array $value): void
     {
-        setcookie(
-            name: $this->key(),
-            value: serialize($value),
-            httponly: true
-        );
+		$_COOKIE[$name  = $this->key()] = $value = serialize($value);
+
+		if (headers_sent() === false) {
+			setcookie(name: $name, value: $value, httponly: true);
+		}
     }
 }

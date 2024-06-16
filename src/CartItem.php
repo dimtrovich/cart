@@ -17,6 +17,15 @@ use BlitzPHP\Utilities\Iterable\Arr;
 use Dimtrovich\Cart\Contracts\Buyable;
 use InvalidArgumentException;
 
+/**
+ * Representation of an item in a cart
+ *
+ * @property float|int $total Price for whole CartItem with TAX
+ * @property float|int $priceTax Price with TAX
+ * @property float|int $subtotal Price for whole CartItem without TAX
+ * @property float|int $tax Applicable tax for one cart item
+ * @property float|int $taxTotal Applicable tax for whole cart item
+ */
 class CartItem implements Arrayable, Jsonable
 {
     /**
@@ -45,11 +54,6 @@ class CartItem implements Arrayable, Jsonable
     private float|int $taxRate = 0;
 
     /**
-     * The tax price for the cart item.
-     */
-    private float|int $priceTax = 0;
-
-    /**
      * CartItem constructor.
      *
      * @param int|string $id    The ID of the cart item.
@@ -68,59 +72,71 @@ class CartItem implements Arrayable, Jsonable
             throw new InvalidArgumentException('Please supply a valid price.');
         }
 
-        $this->price   = (float) $price;
-        $this->options = new CartItemOptions($options);
-        $this->rowId   = $this->generateRowId($id, $options);
+		$this->price    = (float) $price;
+		$this->options  = new CartItemOptions($options);
+		$this->rowId    = $this->generateRowId($id, $options);
     }
 
     /**
      * Returns the formatted price without TAX.
+	 *
+	 * @return float|string
      */
-    public function price(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null): string
+    public function price(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null)
     {
-        return $this->numberFormat($this->price, $decimals, $decimalPoint, $thousandSeperator);
+        return func_num_args() < 2 ? $this->price : $this->numberFormat($this->price, $decimals, $decimalPoint, $thousandSeperator);
     }
 
     /**
      * Returns the formatted price with TAX.
+	 *
+	 * @return float|string
      */
-    public function priceTax(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null): string
+    public function priceTax(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null)
     {
-        return $this->numberFormat($this->priceTax, $decimals, $decimalPoint, $thousandSeperator);
+        return func_num_args() < 2 ? $this->priceTax : $this->numberFormat($this->priceTax, $decimals, $decimalPoint, $thousandSeperator);
     }
 
     /**
      * Returns the formatted subtotal.
      * Subtotal is price for whole CartItem without TAX
+	 *
+	 * @return float|string
      */
-    public function subtotal(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null): string
+    public function subtotal(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null)
     {
-        return $this->numberFormat($this->subtotal, $decimals, $decimalPoint, $thousandSeperator);
+        return func_num_args() < 2 ? $this->subtotal : $this->numberFormat($this->subtotal, $decimals, $decimalPoint, $thousandSeperator);
     }
 
     /**
      * Returns the formatted total.
      * Total is price for whole CartItem with TAX
+	 *
+	 * @return float|string
      */
-    public function total(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null): string
+    public function total(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null)
     {
-        return $this->numberFormat($this->total, $decimals, $decimalPoint, $thousandSeperator);
+        return func_num_args() < 2 ? $this->total : $this->numberFormat($this->total, $decimals, $decimalPoint, $thousandSeperator);
     }
 
     /**
      * Returns the formatted tax.
+	 *
+	 * @return float|string
      */
-    public function tax(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null): string
+    public function tax(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null)
     {
-        return $this->numberFormat($this->tax, $decimals, $decimalPoint, $thousandSeperator);
+        return func_num_args() < 2 ? $this->tax : $this->numberFormat($this->tax, $decimals, $decimalPoint, $thousandSeperator);
     }
 
     /**
      * Returns the formatted tax.
+	 *
+	 * @return float|string
      */
-    public function taxTotal(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null): string
+    public function taxTotal(?int $decimals = null, ?string $decimalPoint = null, ?string $thousandSeperator = null)
     {
-        return $this->numberFormat($this->taxTotal, $decimals, $decimalPoint, $thousandSeperator);
+        return func_num_args() < 2 ? $this->taxTotal : $this->numberFormat($this->taxTotal, $decimals, $decimalPoint, $thousandSeperator);
     }
 
     /**
@@ -139,7 +155,6 @@ class CartItem implements Arrayable, Jsonable
         $this->id       = $item->getBuyableIdentifier($this->options);
         $this->name     = $item->getBuyableDescription($this->options);
         $this->price    = $item->getBuyablePrice($this->options);
-        $this->priceTax = $this->price + $this->tax;
     }
 
     /**
@@ -151,7 +166,6 @@ class CartItem implements Arrayable, Jsonable
         $this->qty      = Arr::get($attributes, 'qty', $this->qty);
         $this->name     = Arr::get($attributes, 'name', $this->name);
         $this->price    = Arr::get($attributes, 'price', $this->price);
-        $this->priceTax = $this->price + $this->tax;
         $this->options  = new CartItemOptions(Arr::get($attributes, 'options', $this->options->toArray()));
 
         $this->rowId = $this->generateRowId($this->id, $this->options->all());
@@ -266,16 +280,11 @@ class CartItem implements Arrayable, Jsonable
      * Get the formatted number.
      *
      * @param float  $value
-     * @param int    $decimals
      * @param string $decimalPoint
      * @param string $thousandSeperator
      */
-    private function numberFormat($value, $decimals, $decimalPoint, $thousandSeperator): string
+    private function numberFormat($value, int $decimals, $decimalPoint, $thousandSeperator): string
     {
-        if (null === $decimals) {
-            $decimals = 2;
-        }
-
         if (null === $decimalPoint) {
             $decimalPoint = '.';
         }

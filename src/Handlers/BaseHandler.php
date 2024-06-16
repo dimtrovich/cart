@@ -17,14 +17,9 @@ use Dimtrovich\Cart\Contracts\StoreManager;
 abstract class BaseHandler implements StoreManager
 {
     /**
-     * Identifiant du panier
+     * cary indentifier
      */
     protected string $cartId;
-
-    /**
-     * Liste des elements du panier
-     */
-    protected array $items;
 
     /**
      * {@inheritDoc}
