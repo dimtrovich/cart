@@ -326,7 +326,7 @@ class Cart
         } elseif (is_array($id)) {
             $cartItem = CartItem::fromArray($id);
             $cartItem->setQuantity($id['qty']);
-            if (isset($id['tax'])) {
+            if (isset($id['tax']) && $id['price'] != 0) {
                 $taxRate = (100 * $id['tax']) / $id['price'];
             }
         } else {
