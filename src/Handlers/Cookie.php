@@ -50,7 +50,7 @@ class Cookie extends BaseHandler implements StoreManager
         $_COOKIE[$name = $this->key()] = $value = serialize($value);
 
         if (headers_sent() === false) {
-            setcookie(name: $name, value: $value, httponly: true);
+            setcookie(name: $name, value: $value, httponly: true, path: '/');
         }
     }
 }
