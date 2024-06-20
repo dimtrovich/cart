@@ -17,8 +17,10 @@ interface StoreManager
 {
     /**
      * Initializes the store manager
+     *
+     * @param array<string, mixed> $options
      */
-    public function init(string $cartId): bool;
+    public function init(string $cartId, array $options = []): bool;
 
     /**
      * Checks if store content the cart item
