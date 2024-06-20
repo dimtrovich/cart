@@ -326,7 +326,7 @@ class Cart
         } elseif (is_array($id)) {
             $cartItem = CartItem::fromArray($id);
             $cartItem->setQuantity($id['qty']);
-            if (isset($id['tax']) && $id['price'] != 0) {
+            if (isset($id['tax']) && $id['price'] !== 0) {
                 $taxRate = (100 * $id['tax']) / $id['price'];
             }
         } else {
@@ -404,8 +404,11 @@ class Cart
             $this->store = new $handler();
         }
 
-        if (! $this->store->init($this->currentInstance())) {
-            throw new RuntimeException(sprintf('Handler %s could not be initialize', get_class($this->store)));
+        $class   = get_class($this->store);
+        $options = $this->config('options.' . $class, []);
+
+        if (! $this->store->init($this->currentInstance(), $options)) {
+            throw new RuntimeException(sprintf('Handler %s could not be initialize', $class));
         }
 
         return $this;

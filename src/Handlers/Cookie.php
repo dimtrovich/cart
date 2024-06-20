@@ -11,10 +11,13 @@
 
 namespace Dimtrovich\Cart\Handlers;
 
+use BlitzPHP\Traits\Support\InteractsWithTime;
 use Dimtrovich\Cart\Contracts\StoreManager;
 
 class Cookie extends BaseHandler implements StoreManager
 {
+    use InteractsWithTime;
+
     public function has(): bool
     {
         return isset($_COOKIE[$this->key()]);
@@ -50,7 +53,33 @@ class Cookie extends BaseHandler implements StoreManager
         $_COOKIE[$name = $this->key()] = $value = serialize($value);
 
         if (headers_sent() === false) {
-            setcookie(name: $name, value: $value, httponly: true, path: '/');
+            setcookie($name, $value, $this->parseCookieOptions());
         }
+    }
+
+    /**
+     * @internal
+     *
+     * @return array<string, mixed>
+     */
+    private function parseCookieOptions(): array
+    {
+        $options = [
+            'expires'  => $this->option('expires'),
+            'path'     => $this->option('path', ''),
+            'domain'   => $this->option('domain', ''),
+            'secure'   => $this->option('secure', false),
+            'httponly' => $this->option('httponly', true),
+            'samesite' => $this->option('samesite', 'Lax'),
+        ];
+
+        if (! empty($options['expires'])) {
+            if (is_numeric($options['expires'])) {
+                $options['expires'] *= 60;
+            }
+            $options['expires'] = $this->availableAt($options['expires']);
+        }
+
+        return $options;
     }
 }

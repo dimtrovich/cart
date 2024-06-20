@@ -18,7 +18,7 @@ class Session extends BaseHandler implements StoreManager
     /**
      * {@inheritDoc}
      */
-    public function init(string $cartId): bool
+    public function init(string $cartId, array $options = []): bool
     {
         if (session_status() === PHP_SESSION_DISABLED) {
             return false;
@@ -28,7 +28,7 @@ class Session extends BaseHandler implements StoreManager
             session_start();
         }
 
-        return parent::init($cartId);
+        return parent::init($cartId, $options);
     }
 
     /**

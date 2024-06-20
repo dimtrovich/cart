@@ -9,6 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
+use BlitzPHP\Utilities\Date;
 use BlitzPHP\Utilities\Iterable\Collection;
 use Dimtrovich\Cart\Cart;
 use Dimtrovich\Cart\CartItem;
@@ -520,6 +521,36 @@ describe('Cart', function () {
 
             $cart->destroy();
             expect($cart->count())->toBe(0);
+        });
+
+        it('parseCookieOptions', function () {
+            $cookie = new Cookie();
+            $cookie->init('default', []);
+
+            $reflection = new ReflectionMethod($cookie, 'parseCookieOptions');
+            $reflection->setAccessible(true);
+
+            $options = $reflection->invokeArgs($cookie, []);
+
+            expect($options)->toBe([
+                'expires'  => null,
+                'path'     => '',
+                'domain'   => '',
+                'secure'   => false,
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
+
+            $cookie->init('default', [
+                'expires' => 60,
+            ]);
+
+            $reflection = new ReflectionMethod($cookie, 'parseCookieOptions');
+            $reflection->setAccessible(true);
+
+            $options = $reflection->invokeArgs($cookie, []);
+
+            expect($options['expires'])->toMatch(fn ($actual) => $actual >= Date::now()->addMinutes(60)->getTimestamp());
         });
     });
 });

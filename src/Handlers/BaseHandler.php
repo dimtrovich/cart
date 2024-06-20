@@ -11,6 +11,7 @@
 
 namespace Dimtrovich\Cart\Handlers;
 
+use BlitzPHP\Utilities\Iterable\Arr;
 use BlitzPHP\Utilities\Iterable\Collection;
 use Dimtrovich\Cart\Contracts\StoreManager;
 
@@ -22,11 +23,19 @@ abstract class BaseHandler implements StoreManager
     protected string $cartId;
 
     /**
+     * handler options
+     *
+     * @var array<string, mixed>
+     */
+    protected array $options;
+
+    /**
      * {@inheritDoc}
      */
-    public function init(string $cartId): bool
+    public function init(string $cartId, array $options = []): bool
     {
-        $this->cartId = $cartId;
+        $this->cartId  = $cartId;
+        $this->options = $options;
 
         if (! $this->has()) {
             $this->write([]);
@@ -71,5 +80,13 @@ abstract class BaseHandler implements StoreManager
     protected function key(): string
     {
         return 'card:' . $this->cartId;
+    }
+
+    /**
+     * Get a specific option for handler
+     */
+    protected function option(string $key, mixed $default = null): mixed
+    {
+        return Arr::dataGet($this->options, $key, $default);
     }
 }
