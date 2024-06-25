@@ -171,7 +171,7 @@ class CartItem implements Arrayable, Jsonable
         $this->qty     = Arr::get($attributes, 'qty', $this->qty);
         $this->name    = Arr::get($attributes, 'name', $this->name);
         $this->price   = Arr::get($attributes, 'price', $this->price);
-        $this->options = new CartItemOptions(Arr::get($attributes, 'options', $this->options->toArray()));
+        $this->options = new CartItemOptions(array_merge($options = $this->options->toArray(), Arr::get($attributes, 'options', $options)));
 
         $this->rowId = $this->generateRowId($this->id, $this->options->all());
     }
