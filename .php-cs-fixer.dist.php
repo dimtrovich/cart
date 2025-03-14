@@ -43,5 +43,5 @@ return Factory::create(new Blitz(), $overrides, $options)->forLibrary(
     'dimtrovich/cart"',
     'Dimitri Sitchet Tomkeu',
     'devcode.dst@gmail.com',
-    date('Y')
+    2024
 );

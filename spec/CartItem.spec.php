@@ -68,8 +68,8 @@ describe('CartItem', function () {
     });
 
     it('can define a custom rowId generator', function () {
-        CartItem::setRowIdGenerator(fn($id, $options) => (string) $id);
-        
+        CartItem::setRowIdGenerator(fn ($id, $options) => (string) $id);
+
         $item = new CartItem(1, 'Some item', 10.00, ['size' => 'XL', 'color' => 'red']);
         $item->setQuantity(2);
 
