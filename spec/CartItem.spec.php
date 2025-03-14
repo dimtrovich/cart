@@ -11,6 +11,8 @@
 
 use Dimtrovich\Cart\CartItem;
 
+use function Kahlan\expect;
+
 describe('CartItem', function () {
     it('can be cast to an array', function () {
         $item = new CartItem(1, 'Some item', 10.00, ['size' => 'XL', 'color' => 'red']);
@@ -63,5 +65,28 @@ describe('CartItem', function () {
             'taxRate'      => 0,
             'notAttribute' => null,
         ]);
+    });
+
+    it('can define a custom rowId generator', function () {
+        CartItem::setRowIdGenerator(fn ($id, $options) => (string) $id);
+
+        $item = new CartItem(1, 'Some item', 10.00, ['size' => 'XL', 'color' => 'red']);
+        $item->setQuantity(2);
+
+        expect($item->toArray())->toEqual([
+            'rowId'   => '1',
+            'id'      => 1,
+            'name'    => 'Some item',
+            'qty'     => 2,
+            'price'   => 10,
+            'options' => [
+                'size'  => 'XL',
+                'color' => 'red',
+            ],
+            'tax'      => 0,
+            'subtotal' => 20,
+        ]);
+
+        CartItem::setRowIdGenerator(null);
     });
 });

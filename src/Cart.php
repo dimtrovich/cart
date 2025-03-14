@@ -83,9 +83,9 @@ class Cart
      * @param array<string, mixed>|float|int|null $qty
      * @param array<string, mixed>                $options
      *
-     * @return CartItem|CartItem[]
+     * @return CartItem|list<CartItem>
      */
-    public function add(mixed $id, mixed $name = null, null|array|float|int $qty = null, ?float $price = null, array $options = [])
+    public function add(mixed $id, mixed $name = null, array|float|int|null $qty = null, ?float $price = null, array $options = [])
     {
         if ($this->isMulti($id)) {
             return array_map(fn ($item) => $this->add($item), $id);
@@ -316,7 +316,7 @@ class Cart
      * @param array<string, mixed>|float|int|null $qty
      * @param array<string, mixed>                $options
      */
-    private function createCartItem(mixed $id, mixed $name, null|array|float|int $qty, ?float $price, array $options): CartItem
+    private function createCartItem(mixed $id, mixed $name, array|float|int|null $qty, ?float $price, array $options): CartItem
     {
         $taxRate = null;
 
