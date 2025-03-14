@@ -14,6 +14,7 @@ namespace Dimtrovich\Cart;
 use BlitzPHP\Contracts\Support\Arrayable;
 use BlitzPHP\Contracts\Support\Jsonable;
 use BlitzPHP\Utilities\Iterable\Arr;
+use Closure;
 use Dimtrovich\Cart\Contracts\Buyable;
 use InvalidArgumentException;
 
@@ -52,6 +53,11 @@ class CartItem implements Arrayable, Jsonable
      * The tax rate for the cart item.
      */
     private float|int $taxRate = 0;
+
+    /**
+     * Custom rowId generator
+     */
+    private static ?Closure $rowIdGenerator = null;
 
     /**
      * CartItem constructor.
@@ -251,12 +257,33 @@ class CartItem implements Arrayable, Jsonable
     }
 
     /**
+     * Sets a custom row ID generator for cart items.
+     *
+     * This method allows you to provide a custom closure that generates a unique row ID for each cart item.
+     * The closure should accept two parameters: $id (the item's identifier) and $options (an array of item options).
+     * It should return a string representing the unique row ID.
+     *
+     * If no custom generator is provided, the default row ID generator will be used, which generates a unique MD5 hash
+     * based on the item's identifier and serialized options.
+     *
+     * @param Closure(int|string $id, array $options): string|null $generator The custom row ID generator closure or null to reset to default.
+     */
+    public static function setRowIdGenerator(?Closure $generator): void
+    {
+        self::$rowIdGenerator = $generator;
+    }
+
+    /**
      * Generate a unique id for the cart item.
      *
      * @param array<string, mixed> $options
      */
     protected function generateRowId(int|string $id, array $options): string
     {
+        if (null !== self::$rowIdGenerator) {
+            return call_user_func(self::$rowIdGenerator, $id, $options);
+        }
+
         ksort($options);
 
         return md5($id . serialize($options));
