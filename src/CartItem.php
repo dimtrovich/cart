@@ -64,19 +64,15 @@ class CartItem implements Arrayable, Jsonable
      *
      * @param int|string           $id      The ID of the cart item.
      * @param string               $name    The name of the cart item.
-     * @param float                $price
      * @param array<string, mixed> $options
      */
-    public function __construct(public int|string $id, public string $name, $price, array $options = [])
+    public function __construct(public int|string $id, public string $name, float|int $price, array $options = [])
     {
         if (empty($id)) {
             throw new InvalidArgumentException('Please supply a valid identifier.');
         }
         if (empty($name)) {
             throw new InvalidArgumentException('Please supply a valid name.');
-        }
-        if (! is_numeric($price)) {
-            throw new InvalidArgumentException('Please supply a valid price.');
         }
 
         $this->price   = (float) $price;
@@ -266,7 +262,7 @@ class CartItem implements Arrayable, Jsonable
      * If no custom generator is provided, the default row ID generator will be used, which generates a unique MD5 hash
      * based on the item's identifier and serialized options.
      *
-     * @param Closure(int|string $id, array $options): string|null $generator The custom row ID generator closure or null to reset to default.
+     * @param Closure(int|string $id, array<string,mixed> $options): string|null $generator The custom row ID generator closure or null to reset to default.
      */
     public static function setRowIdGenerator(?Closure $generator): void
     {
